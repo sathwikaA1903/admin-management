@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% block title %}Discussion{% endblock %}
+<nav class="sidebar">
+    <a href="{{ url_for('dashboard') }}" class="sidebar-link {% if request.endpoint == 'dashboard' %}active{% endif %}"><span class="icon">🗂</span> Dashboard</a>
+    <a href="{{ url_for('tasks') }}" class="sidebar-link {% if request.endpoint == 'tasks' %}active{% endif %}"><span class="icon">📝</span> Tasks</a>
+    <a href="{{ url_for('documents') }}" class="sidebar-link project-link {% if request.endpoint == 'documents' %}active special{% endif %}"><span class="icon">📁</span> Projects</a>
+    <a href="{{ url_for('discussion') }}" class="sidebar-link {% if request.endpoint == 'discussion' %}active{% endif %}"><span class="icon">💬</span> Discussion</a>
+    <a href="{{ url_for('documents') }}" class="sidebar-link document-link {% if request.endpoint == 'documents' %}active special{% endif %}"><span class="icon">📄</span> Documents</a>
+    <a href="{{ url_for('notes') }}" class="sidebar-link {% if request.endpoint == 'notes' %}active{% endif %}"><span class="icon">📝</span> Notes</a>
+    <a href="{{ url_for('reports') }}" class="sidebar-link {% if request.endpoint == 'reports' %}active{% endif %}"><span class="icon">📊</span> Reports</a>
+    <a href="{{ url_for('users') }}" class="sidebar-link {% if request.endpoint == 'users' %}active{% endif %}"><span class="icon">🧑</span> Users</a>
+    <a href="{{ url_for('settings') }}" class="sidebar-link settings-link {% if request.endpoint == 'settings' %}active{% endif %}"><span class="icon">⚙</span> Settings</a>
+</nav>
+{% block content %}
+<h1>Discussion Board</h1>
+<div class="progress-section">
+  <h2>Discussion Progress</h2>
+  <div class="progress-bar-container">
+    <div class="progress-bar discussion" style="width: {{ discussion_progress }}%;">
+      {{ discussion_progress }}%
+    </div>
+  </div>
+</div>
+<div class="discussion-section">
+    <form method="POST" action="">
+        <label for="new_topic">Start New Topic:</label>
+        <input type="text" id="new_topic" name="new_topic" placeholder="Enter topic title" required>
+        <textarea name="message" placeholder="Type your message here..." required></textarea>
+        <button type="submit">Post</button>
+    </form>
+    <hr>
+    <h2>Recent Discussions</h2>
+    <ul>
+        {% for topic in discussions %}
+        <li>
+            <strong>{{ topic.title }}</strong> by {{ topic.author }}<br>
+            <small>{{ topic.timestamp }}</small>
+            <p>{{ topic.message }}</p>
+        </li>
+        {% else %}
+        <li>No discussions yet.</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% block title %}Edit User - Admin{% endblock %}
+{% block content %}
+<div class="container" style="max-width: 500px; margin: 40px auto; background: #fff; border-radius: 12px; padding: 32px 36px; box-shadow: 0 4px 18px rgba(80,0,120,0.09);">
+    <h2>Edit User</h2>
+    <form method="POST">
+        <div class="form-group">
+            <label>Username:</label>
+            <input type="text" name="username" value="{{ user['username'] }}" required>
+        </div>
+        <div class="form-group">
+            <label>Email:</label>
+            <input type="email" name="email" value="{{ user['email'] }}" required>
+        </div>
+        <div class="form-group">
+            <label>Department:</label>
+            <select name="department_id" required>
+                {% for dept in departments %}
+                    <option value="{{ dept['id'] }}" {% if user['department_id'] == dept['id'] %}selected{% endif %}>{{ dept['name'] }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Role:</label>
+            <select name="role" required>
+                <option value="user" {% if user['role'] == 'user' %}selected{% endif %}>User</option>
+                <option value="admin" {% if user['role'] == 'admin' %}selected{% endif %}>Admin</option>
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Update User</button>
+        <a href="{{ url_for('admin_dashboard') }}" class="btn btn-secondary" style="margin-left: 8px;">Cancel</a>
+    </form>
+</div>
+{% endblock %}

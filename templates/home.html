@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Task Tracker - Login</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='home.css') }}">
+    <link href="https://fonts.googleapis.com/css?family=Inter:400,600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="main-header">
+        <div class="logo">
+            <span class="logo-pink">TASK</span> <span class="logo-blue">TRACKER</span>
+        </div>
+    </header>
+    <main class="main-content">
+        <div class="login-card">
+            <h2>Log in to your account</h2>
+            <form>
+
+                <div class="input-group">
+                    <span class="input-icon">📧</span>
+                    <input type="text" placeholder="Email / Phone" required>
+                </div>
+                <div class="input-group">
+                    <span class="input-icon">🔒</span>
+                    <input type="password" placeholder="Password" required>
+                    <span class="input-icon right">👁️</span>
+                </div>
+                <div class="form-options">
+                    <a href="#" class="forgot-link">Forgot Password?</a>
+                </div>
+                <button type="submit" class="btn login-main">Log in</button>
+            </form>
+            <div class="signup-link">
+                Dont have an account? <a href="#">Sign Up for Free</a>
+            </div>
+        </div>
+        </div>
+    </main>
+</body>
+</html>

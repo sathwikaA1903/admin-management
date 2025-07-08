@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% block title %}Reports{% endblock %}
+<nav class="sidebar">
+    <a href="{{ url_for('dashboard') }}" class="sidebar-link {% if request.endpoint == 'dashboard' %}active{% endif %}"><span class="icon">🗂</span> Dashboard</a>
+    <a href="{{ url_for('tasks') }}" class="sidebar-link {% if request.endpoint == 'tasks' %}active{% endif %}"><span class="icon">📝</span> Tasks</a>
+    <a href="{{ url_for('documents') }}" class="sidebar-link project-link {% if request.endpoint == 'documents' %}active special{% endif %}"><span class="icon">📁</span> Projects</a>
+    <a href="{{ url_for('discussion') }}" class="sidebar-link {% if request.endpoint == 'discussion' %}active{% endif %}"><span class="icon">💬</span> Discussion</a>
+    <a href="{{ url_for('documents') }}" class="sidebar-link document-link {% if request.endpoint == 'documents' %}active special{% endif %}"><span class="icon">📄</span> Documents</a>
+    <a href="{{ url_for('notes') }}" class="sidebar-link {% if request.endpoint == 'notes' %}active{% endif %}"><span class="icon">📝</span> Notes</a>
+    <a href="{{ url_for('reports') }}" class="sidebar-link {% if request.endpoint == 'reports' %}active{% endif %}"><span class="icon">📊</span> Reports</a>
+    <a href="{{ url_for('users') }}" class="sidebar-link {% if request.endpoint == 'users' %}active{% endif %}"><span class="icon">🧑</span> Users</a>
+    <a href="{{ url_for('settings') }}" class="sidebar-link settings-link {% if request.endpoint == 'settings' %}active{% endif %}"><span class="icon">⚙</span> Settings</a>
+</nav>
+{% block content %}
+<h1 class="page-title">📊 Progress Reports</h1>
+<div class="reports-section">
+    <div class="summary-cards">
+        <div class="card">
+            <h3>Total Projects</h3>
+            <p>{{ reports|length }}</p>
+        </div>
+        <div class="card">
+            <h3>Total Tasks</h3>
+            <p>{{ reports|sum(attribute='total_tasks') }}</p>
+        </div>
+        <div class="card">
+            <h3>Completed</h3>
+            <p>{{ reports|sum(attribute='completed') }}</p>
+        </div>
+        <div class="card">
+            <h3>Pending</h3>
+            <p>{{ reports|sum(attribute='pending') }}</p>
+        </div>
+    </div>
+    <h2>Project/Task Overview</h2>
+    <table class="styled-table">
+        <thead>
+            <tr>
+                <th>Project</th>
+                <th>Tasks</th>
+                <th>Completed</th>
+                <th>Pending</th>
+                <th>Progress</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for report in reports %}
+            <tr>
+                <td>{{ report.project }}</td>
+                <td>{{ report.total_tasks }}</td>
+                <td>{{ report.completed }}</td>
+                <td>{{ report.pending }}</td>
+                <td><span class="progress-badge">{{ report.progress }}%</span></td>
+            </tr>
+            {% else %}
+            <tr><td colspan="5">No reports available.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <hr>
+    <a href="{{ url_for('download_report') }}" class="btn btn-download">⬇ Download Full Report</a>
+</div>
+<style>
+.page-title { margin-bottom: 18px; }
+.summary-cards { display: flex; gap: 18px; margin-bottom: 18px; }
+.card { background: #f8f9fb; border-radius: 8px; padding: 18px 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); min-width: 110px; text-align: center; }
+.styled-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+.styled-table th, .styled-table td { padding: 10px 14px; border-bottom: 1px solid #e0e0e0; }
+.styled-table th { background: #eff3f6; }
+.progress-badge { background: #1976d2; color: #fff; padding: 3px 10px; border-radius: 14px; font-weight: 600; }
+.btn-download { display: inline-block; margin-top: 12px; padding: 8px 18px; background: #1976d2; color: #fff; border-radius: 6px; text-decoration: none; font-weight: 600; transition: background 0.2s; }
+.btn-download:hover { background: #125ea8; }
+</style>
+{% endblock %}

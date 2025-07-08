@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>bordio. | Log In</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='login.css') }}">
+    <link href="https://fonts.googleapis.com/css?family=Inter:400,600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="background"></div>
+    <div class="container">
+        <div class="logo">
+            <svg width="38" height="38" viewBox="0 0 38 38" fill="none">
+                <path d="M7 29L24 7H31L14 29H7Z" fill="#3B82F6"/>
+            </svg>
+            <span class="logo-text">KVR Infinity</span>
+        </div>
+
+        <h1>Admin Login</h1>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="{{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    <div class="login-card">
+        <h2>Log In</h2>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert {{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        <form method="POST" class="login-form">
+            <label for="username">Username</label>
+            <input type="text" id="username" name="username" placeholder="Enter your username" required>
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" placeholder="Enter your password" required>
+            <button type="submit" class="login-main-btn">Log In</button>
+        </form>
+        <div class="links">
+            <span>Forgot password? <a href="#">Reset</a></span>
+        </div>
+    </div>
+    <style>
+    body { background: #f8f9fb; font-family: 'Inter', Arial, sans-serif; }
+    .container { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; }
+    .logo { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; }
+    .logo-text { font-size: 1.5rem; font-weight: 700; color: #1976d2; letter-spacing: 2px; }
+    .login-card { background: #fff; border-radius: 10px; padding: 36px 32px; box-shadow: 0 2px 12px rgba(0,0,0,0.07); max-width: 350px; width: 100%; }
+    .login-card h2 { margin-bottom: 18px; color: #222b45; }
+    .login-form { display: flex; flex-direction: column; gap: 13px; }
+    .login-form label { font-weight: 500; color: #222b45; }
+    .login-form input { padding: 8px 12px; border-radius: 6px; border: 1px solid #e0e0e0; font-size: 1rem; }
+    .login-main-btn { background: #1976d2; color: #fff; border: none; border-radius: 6px; padding: 10px 0; font-size: 1rem; font-weight: 600; margin-top: 8px; cursor: pointer; transition: background 0.2s; }
+    .login-main-btn:hover { background: #125ea8; }
+    .links { margin-top: 14px; text-align: center; }
+    .links a { color: #1976d2; text-decoration: none; }
+    .alert { background: #e0f7fa; color: #006064; border-radius: 5px; padding: 8px 12px; margin-bottom: 10px; text-align: center; }
+    </style>
+    </div>
+</body>
+</html>

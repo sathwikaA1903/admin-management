@@ -1,0 +1,279 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Inter', Arial, sans-serif;
+    background: #f5f7fa;
+    min-height: 100vh;
+}
+
+.main-header {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 32px 48px 0 48px;
+    background: #fff;
+    box-sizing: border-box;
+}
+
+.logo {
+    font-size: 2rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+}
+
+.logo-pink {
+    color: #f36b9a;
+}
+
+.logo-blue {
+    color: #2d3aef;
+}
+
+.nav {
+    display: flex;
+    gap: 28px;
+    margin-left: 32px;
+}
+
+.nav-link {
+    color: #222;
+    text-decoration: none;
+    font-size: 1rem;
+    font-weight: 500;
+    padding-bottom: 2px;
+    position: relative;
+    transition: color 0.2s;
+}
+
+.nav-link.active,
+.nav-link:hover {
+    color: #f36b9a;
+}
+
+.nav-icon {
+    font-size: 1.1rem;
+    vertical-align: middle;
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.lang-select {
+    border: none;
+    background: transparent;
+    font-size: 1rem;
+    font-weight: 500;
+    color: #222;
+    margin-right: 8px;
+}
+
+.btn {
+    padding: 8px 22px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background 0.2s, color 0.2s;
+}
+
+.signup {
+    background: #f36b9a;
+    color: #fff;
+    margin-right: 4px;
+}
+
+.signup:hover {
+    background: #d92a6a;
+}
+
+.login-btn {
+    background: #fff;
+    color: #2d3aef;
+    border: 2px solid #2d3aef;
+}
+
+.login-btn:hover {
+    background: #e8eafe;
+}
+
+.main-content {
+    min-height: 80vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(120deg, #f5f7fa 70%, #f9e6ef 100%);
+    position: relative;
+}
+
+.login-card {
+    background: #fff;
+    padding: 40px 36px 28px 36px;
+    border-radius: 16px;
+    box-shadow: 0 4px 32px rgba(44, 62, 80, 0.08);
+    width: 400px;
+    max-width: 90vw;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.login-card h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 32px;
+    text-align: center;
+}
+
+form {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+label {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 4px;
+    color: #222;
+}
+
+.input-group {
+    display: flex;
+    align-items: center;
+    background: #f5f7fa;
+    border-radius: 8px;
+    padding: 0 12px;
+    margin-bottom: 6px;
+    border: 1.5px solid #f5f7fa;
+    transition: border 0.2s;
+}
+
+.input-group:focus-within {
+    border: 1.5px solid #f36b9a;
+}
+
+.input-icon {
+    font-size: 1.2rem;
+    color: #bdbdbd;
+    margin-right: 8px;
+}
+
+.input-icon.right {
+    margin-left: auto;
+    margin-right: 0;
+    cursor: pointer;
+}
+
+input[type="text"], input[type="password"] {
+    border: none;
+    outline: none;
+    background: transparent;
+    font-size: 1rem;
+    padding: 14px 0;
+    width: 100%;
+    color: #222;
+}
+
+.form-options {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 10px;
+}
+
+.forgot-link {
+    font-size: 0.95rem;
+    color: #f36b9a;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.forgot-link:hover {
+    text-decoration: underline;
+}
+
+.btn.login-main {
+    background: #f36b9a;
+    color: #fff;
+    width: 100%;
+    margin-top: 12px;
+    font-size: 1.1rem;
+    padding: 14px 0;
+    border-radius: 8px;
+}
+
+.btn.login-main:hover {
+    background: #d92a6a;
+}
+
+.signup-link {
+    margin-top: 18px;
+    font-size: 1rem;
+    color: #222;
+    text-align: center;
+}
+
+.signup-link a {
+    color: #f36b9a;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.signup-link a:hover {
+    text-decoration: underline;
+}
+
+.chat-bubble {
+    position: fixed;
+    bottom: 28px;
+    right: 38px;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.chat-message {
+    background: #fff;
+    color: #222;
+    font-size: 1rem;
+    padding: 16px 18px;
+    border-radius: 14px;
+    box-shadow: 0 2px 14px rgba(44,62,80,0.12);
+    margin-bottom: 10px;
+    max-width: 300px;
+}
+
+.chat-icon {
+    background: #f36b9a;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    color: #fff;
+    font-size: 1.7rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(44,62,80,0.10);
+}
+
+.chat-notif {
+    position: absolute;
+    top: 8px;
+    right: 10px;
+    background: #fff;
+    color: #f36b9a;
+    font-size: 0.85rem;
+    font-weight: 700;
+    border-radius: 50%;
+    padding: 2px 7px;
+    border: 2px solid #f36b9a;
+}

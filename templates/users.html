@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block title %}Users{% endblock %}
+<nav class="sidebar">
+    <a href="{{ url_for('dashboard') }}" class="sidebar-link {% if request.endpoint == 'dashboard' %}active{% endif %}"><span class="icon">🗂</span> Dashboard</a>
+    <a href="{{ url_for('tasks') }}" class="sidebar-link {% if request.endpoint == 'tasks' %}active{% endif %}"><span class="icon">📝</span> Tasks</a>
+    <a href="{{ url_for('documents') }}" class="sidebar-link project-link {% if request.endpoint == 'documents' %}active special{% endif %}"><span class="icon">📁</span> Projects</a>
+    <a href="{{ url_for('discussion') }}" class="sidebar-link {% if request.endpoint == 'discussion' %}active{% endif %}"><span class="icon">💬</span> Discussion</a>
+    <a href="{{ url_for('documents') }}" class="sidebar-link document-link {% if request.endpoint == 'documents' %}active special{% endif %}"><span class="icon">📄</span> Documents</a>
+    <a href="{{ url_for('notes') }}" class="sidebar-link {% if request.endpoint == 'notes' %}active{% endif %}"><span class="icon">📝</span> Notes</a>
+    <a href="{{ url_for('reports') }}" class="sidebar-link {% if request.endpoint == 'reports' %}active{% endif %}"><span class="icon">📊</span> Reports</a>
+    <a href="{{ url_for('users') }}" class="sidebar-link {% if request.endpoint == 'users' %}active{% endif %}"><span class="icon">🧑</span> Users</a>
+    <a href="{{ url_for('settings') }}" class="sidebar-link settings-link {% if request.endpoint == 'settings' %}active{% endif %}"><span class="icon">⚙</span> Settings</a>
+</nav>
+{% block content %}
+<h1 class="page-title">🧑 User Management</h1>
+<div class="users-section">
+    <div class="alert alert-info">User management is currently disabled or not available.</div>
+</div>
+{% endblock %}

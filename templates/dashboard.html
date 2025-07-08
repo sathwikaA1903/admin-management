@@ -1,0 +1,199 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<div class="dashboard-row">
+  <div class="summary-section-container">
+    <div class="summary-section">
+      <div class="summary-title">Overall Summary</div>
+      <div class="summary-cards">
+        <a href="{{ url_for('tasks') }}" class="summary-card">
+          <span class="icon-circle green"><i class="fa-solid fa-clipboard-list"></i></span>
+          <span class="summary-label">Total Task</span>
+        </a>
+        <a href="{{ url_for('tasks', filter='assigned') }}" class="summary-card">
+          <span class="icon-circle red"><i class="fa-solid fa-user"></i></span>
+          <span class="summary-label">Assigned to me</span>
+        </a>
+        <a href="{{ url_for('tasks', filter='due_today') }}" class="summary-card">
+          <span class="icon-circle purple"><i class="fa-solid fa-calendar-day"></i></span>
+          <span class="summary-label">Due today</span>
+        </a>
+        <a href="{{ url_for('tasks', filter='past_due') }}" class="summary-card">
+          <span class="icon-circle orange"><i class="fa-solid fa-user-clock"></i></span>
+          <span class="summary-label">Past due tasks</span>
+        </a>
+      </div>
+    </div>
+    <div class="stats-section white-card">
+      <div class="stats-title">Statistics</div>
+      <div class="stats-toggle">
+        <button class="stats-toggle-btn active">Monthly</button>
+        <button class="stats-toggle-btn">Weekly</button>
+        <button class="stats-toggle-btn">My Task</button>
+      </div>
+      <div class="stats-legend">
+        <span class="legend-completed"></span> Completed
+        <span class="legend-incomplete"></span> Incomplete
+      </div>
+      <div class="stats-chart-placeholder">
+        <canvas id="statisticsChart" width="350" height="180"></canvas>
+      </div>
+      <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+      <script>
+        const statBtns = document.querySelectorAll('.stats-toggle-btn');
+        let chart;
+        function fetchAndRenderStats(type) {
+          fetch(`/api/statistics?type=${type}`)
+            .then(res => res.json())
+            .then(data => {
+              const completed = data.completed || 0;
+              const incomplete = data.incomplete || 0;
+              renderChart(completed, incomplete);
+            });
+        }
+        function renderChart(completed, incomplete) {
+          const ctx = document.getElementById('statisticsChart').getContext('2d');
+          if (chart) chart.destroy();
+          chart = new Chart(ctx, {
+            type: 'pie',
+            data: {
+              labels: ['Completed', 'Incomplete'],
+              datasets: [{
+                data: [completed, incomplete],
+                backgroundColor: ['#1de9b6', '#ff5252'],
+              }]
+            },
+            options: {
+              plugins: {
+                legend: { display: true, position: 'bottom' }
+              }
+            }
+          });
+        }
+        statBtns.forEach((btn, idx) => {
+          btn.onclick = function() {
+            statBtns.forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            const types = ['monthly', 'weekly', 'mytask'];
+            fetchAndRenderStats(types[idx]);
+          }
+        });
+        // Initial load
+        fetchAndRenderStats('monthly');
+      </script>
+    </div>
+  </div>
+  <div class="today-section-container">
+    <div class="today-section">
+      <div class="today-title">Today's Summary</div>
+      <div class="today-cards-row">
+        <a href="{{ url_for('tasks', filter='new') }}" class="today-card blue-bg">
+          <span class="icon-circle white"><i class="fa-solid fa-clipboard-list"></i></span>
+          <span class="today-label">New task</span>
+        </a>
+        <a href="{{ url_for('tasks', filter='completed') }}" class="today-card blue-bg">
+          <span class="icon-circle white"><i class="fa-solid fa-clipboard-list"></i></span>
+          <span class="today-label">Closed task</span>
+        </a>
+      </div>
+    </div>
+<div class="calendar-section white-card">
+  <div id="calendar">
+    <div class="calendar-header">
+      <div class="calendar-header">
+      <button id="prev-month">&lt;</button>
+      <span id="month-year"></span>
+      <button id="next-month">&gt;</button>
+    </div>
+    <div class="calendar-body">
+      <div class="calendar-weekdays"></div>
+      <div class="calendar-dates"></div>
+    </div>
+    </div>
+        <script>
+const calendarWeekdays = document.querySelector('.calendar-weekdays');
+const calendarDates = document.querySelector('.calendar-dates');
+const monthYear = document.getElementById('month-year');
+const prevMonthBtn = document.getElementById('prev-month');
+const nextMonthBtn = document.getElementById('next-month');
+
+const months = [
+  'January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December'
+];
+
+const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+let currentDate = new Date();
+let currentMonth = currentDate.getMonth();
+let currentYear = currentDate.getFullYear();
+
+function renderCalendar(month, year) {
+  // Render weekdays
+  calendarWeekdays.innerHTML = '';
+  weekdays.forEach(day => {
+    const weekdayDiv = document.createElement('div');
+    weekdayDiv.textContent = day;
+    calendarWeekdays.appendChild(weekdayDiv);
+  });
+
+  // Render dates
+  calendarDates.innerHTML = '';
+  monthYear.textContent = `${months[month]} ${year}`;
+  const firstDay = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+  // Blank days before first day
+  for (let i = 0; i < firstDay; i++) {
+    const blank = document.createElement('div');
+    calendarDates.appendChild(blank);
+  }
+
+  // Dates of month
+  for (let i = 1; i <= daysInMonth; i++) {
+    const dayDiv = document.createElement('div');
+    dayDiv.textContent = i;
+    // Highlight today
+    if (
+      i === currentDate.getDate() &&
+      month === currentDate.getMonth() &&
+      year === currentDate.getFullYear()
+    ) {
+      dayDiv.classList.add('today');
+    }
+    calendarDates.appendChild(dayDiv);
+  }
+}
+
+prevMonthBtn.addEventListener('click', () => {
+  if (currentMonth === 0) {
+    currentMonth = 11;
+    currentYear--;
+  } else {
+    currentMonth--;
+  }
+  renderCalendar(currentMonth, currentYear);
+});
+
+nextMonthBtn.addEventListener('click', () => {
+  if (currentMonth === 11) {
+    currentMonth = 0;
+    currentYear++;
+  } else {
+    currentMonth++;
+  }
+  renderCalendar(currentMonth, currentYear);
+});
+
+// Initial render
+renderCalendar(currentMonth, currentYear);
+</script>
+
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Update Task</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .container { max-width: 600px; margin: 0 auto; }
+        form { background: #f5f5f5; padding: 20px; border-radius: 8px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; font-weight: bold; margin-bottom: 5px; }
+        input, select, textarea { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; }
+        button { background: #4CAF50; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Update Task</h1>
+        <form method="POST">
+            <label>Project Name:</label>
+            <input type="text" name="project_name" value="{{ task['project_name'] }}" required>
+            <label>Job Number:</label>
+            <input type="text" name="job_number" value="{{ task['job_number'] }}" required>
+            <label>Department:</label>
+            <select name="department_id" required>
+                {% for dept in departments %}
+                    <option value="{{ dept['id'] }}" {% if dept['id'] == task['department_id'] %}selected{% endif %}>{{ dept['name'] }}</option>
+                {% endfor %}
+            </select>
+            <label>Job Description:</label>
+            <textarea name="job_description" rows="3" required>{{ task['job_description'] }}</textarea>
+    
+            <label>Estimate Date of Completion (EDC):</label>
+            <input type="date" name="edc" value="{{ task['edc'] }}" required>
+            <label>Due Date:</label>
+            <input type="date" name="due_date" value="{{ task['due_date'] }}" required>
+            <label>Single Point of Contact (SPOC):</label>
+            <input type="text" name="spoc" value="{{ task['spoc'] }}" required>
+            <label>Completion Percentage:</label>
+            <input type="number" name="completion_percentage" min="0" max="100" value="{{ task['completion_percentage'] or 0 }}" required>
+            <button type="submit">Update Task</button>
+        </form>
+    </div>
+</body>
+</html>

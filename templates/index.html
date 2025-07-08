@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta rel="stylesheet" href="{{ url_for('static', filename='index.css') }}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+<div class="container">
+    <!-- Sidebar -->
+    {{ ... }}
+    <div class="logo">
+<img src="{{ url_for('static', filename='kvr_infinity.jpg') }}" alt="Kvr infinity Logo" width="50" height="56" style="border-radius:10px; margin-bottom:8px;">
+<span class="subtitle">ENDless learning</span>
+</div>
+
+            <nav class="nav">
+                <ul>
+        <li class="active"><i class="fa-solid fa-table-columns"></i> Dashboard</li>
+        <li><i class="fa-solid fa-tasks"></i> Tasks</li>
+        <li><i class="fa-solid fa-folder"></i> Projects</li>
+        <li><i class="fa-solid fa-comments"></i> Discussion</li>
+        <li><i class="fa-solid fa-file-alt"></i> Documents</li>
+        <li><i class="fa-solid fa-note-sticky"></i> Notes</li>
+        <li><i class="fa-solid fa-chart-bar"></i> Reports</li>
+        <li><i class="fa-solid fa-user"></i> Users</li>
+        <li><i class="fa-solid fa-cog"></i> Settings</li>
+        </ul>
+            </nav>
+        </aside>
+        <main class="main-content">
+            <header class="header">
+                <span class="header-title">Task</span>
+                <div class="header-actions">
+                    <input type="text" class="search" placeholder="Type here to Search">
+                    <select class="status-filter">
+                        <option>Status</option>
+                    </select>
+                    <button class="sort-btn">⇅</button>
+                    <button class="calendar-btn">📅</button>
+                    <span class="user-badge">SA</span>
+                    <span class="user-name">Sathwika A</span>
+                </div>
+            </header>
+            <div class="task-view">
+                <div class="view-options">
+                    <span class="active">List</span>
+                    <span>Kanban</span>
+                    <span>Calendar</span>
+                </div>
+                <table class="task-table">
+                    <thead>
+                        <tr>
+                            <th>Task Name</th>
+                            <th>Due Date</th>
+                            <th>Assignee(s)</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- No tasks -->
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+    <script>
+        // Sidebar toggle logic
+        const hamburgerBtn = document.getElementById('hamburgerBtn');
+        const sidebar = document.getElementById('sidebar');
+
+        hamburgerBtn.addEventListener('click', () => {
+            sidebar.classList.toggle('sidebar-open');
+        });
+
+        // Optional: Close sidebar when clicking outside on small screens
+        document.addEventListener('click', function(event) {
+            if (window.innerWidth <= 900) {
+                if (!sidebar.contains(event.target) && !hamburgerBtn.contains(event.target)) {
+                    sidebar.classList.remove('sidebar-open');
+                }
+            }
+        });
+    </script>
+</body>
+</html>

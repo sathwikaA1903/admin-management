@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}KVR∞ ENDless learning{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='admin.css') }}">
+</head>
+<body class="{{ theme }}">
+    <div class="layout">
+        <nav class="sidebar">
+    <div class="sidebar-brand">
+        <div class="logo">KVR<span class="infinity">∞</span></div>
+        <div class="subtitle">END<span style="color:#e53935">less learning</span></div>
+    </div>
+    <div class="sidebar-user-profile">
+        <span class="user-initials">{{ user_initials }}</span>
+        <span class="user-name">{{ user_name }}</span>
+    </div>
+    <ul>
+        <li><a href="{{ url_for('dashboard') }}" class="{% if request.endpoint == 'dashboard' %}active{% endif %}"><i class="fas fa-table-columns"></i> Dashboard</a></li>
+        <li><a href="{{ url_for('tasks') }}" class="{% if request.endpoint == 'tasks' %}active{% endif %}"><i class="fas fa-list"></i> Tasks</a></li>
+        <li><a href="{{ url_for('documents') }}" class="{% if request.endpoint == 'documents' %}active{% endif %}"><i class="fas fa-folder"></i> Projects</a></li>
+        <li><a href="{{ url_for('discussion') }}" class="{% if request.endpoint == 'discussion' %}active{% endif %}"><i class="fas fa-comments"></i> Discussion</a></li>
+        <li><a href="{{ url_for('documents') }}" class="{% if request.endpoint == 'documents' %}active{% endif %}"><i class="fas fa-file-alt"></i> Documents</a></li>
+        <li><a href="{{ url_for('notes') }}" class="{% if request.endpoint == 'notes' %}active{% endif %}"><i class="fas fa-sticky-note"></i> Notes</a></li>
+        <li><a href="{{ url_for('reports') }}" class="{% if request.endpoint == 'reports' %}active{% endif %}"><i class="fas fa-chart-bar"></i> Reports</a></li>
+
+        <li><a href="{{ url_for('settings') }}" class="{% if request.endpoint == 'settings' %}active{% endif %}"><i class="fas fa-cog"></i> Settings</a></li>
+    </ul>
+</nav>
+
+    <div class="main-content">
+        {% block content %}{% endblock %}
+    </div>
+    <style>
+    .topbar {
+        display: flex;
+            align-items: center;
+            gap: 16px;
+            background: #fff;
+            padding: 24px 40px 20px 120px;
+            border-radius: 14px;
+            margin: 25px 20px 0 20px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.03);
+            min-height: 60px;
+        }
+        .search-input {
+            padding: 10px 18px;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+            font-size: 1.1rem;
+            min-width: 230px;
+            background: #fafbfc;
+        }
+        .status-dropdown {
+            padding: 10px 18px;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+            font-size: 1.1rem;
+            background: #fafbfc;
+        }
+        .topbar-checkbox {
+            width: 22px;
+            height: 22px;
+            accent-color: #1976d2;
+            border-radius: 6px;
+            border: 1px solid #e0e0e0;
+            background: #fafbfc;
+        }
+        .logout-form {
+            margin-left: auto;
+        }
+        .logout-btn {
+            background: #ef4444;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 24px;
+            font-size: 1.08rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.18s;
+        }
+        .logout-btn:hover {
+            background: #c62828;
+        }
+        @media (max-width: 700px) {
+            .topbar { flex-wrap: wrap; padding: 18px 2vw 12px 2vw; gap: 8px; }
+            .search-input, .status-dropdown { min-width: 120px; font-size: 1em; }
+            .logout-btn { padding: 8px 16px; font-size: 1em; }
+        }
+        </style>
+    </div>
+</body>
+</html>

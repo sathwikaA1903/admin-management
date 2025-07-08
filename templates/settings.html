@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+{% block title %}Settings{% endblock %}
+<nav class="sidebar">
+    <a href="{{ url_for('dashboard') }}" class="sidebar-link {% if request.endpoint == 'dashboard' %}active{% endif %}"><span class="icon">🗂</span> Dashboard</a>
+    <a href="{{ url_for('tasks') }}" class="sidebar-link {% if request.endpoint == 'tasks' %}active{% endif %}"><span class="icon">📝</span> Tasks</a>
+    <a href="{{ url_for('documents') }}" class="sidebar-link project-link {% if request.endpoint == 'documents' %}active special{% endif %}"><span class="icon">📁</span> Projects</a>
+    <a href="{{ url_for('discussion') }}" class="sidebar-link {% if request.endpoint == 'discussion' %}active{% endif %}"><span class="icon">💬</span> Discussion</a>
+    <a href="{{ url_for('documents') }}" class="sidebar-link document-link {% if request.endpoint == 'documents' %}active special{% endif %}"><span class="icon">📄</span> Documents</a>
+    <a href="{{ url_for('notes') }}" class="sidebar-link {% if request.endpoint == 'notes' %}active{% endif %}"><span class="icon">📝</span> Notes</a>
+    <a href="{{ url_for('reports') }}" class="sidebar-link {% if request.endpoint == 'reports' %}active{% endif %}"><span class="icon">📊</span> Reports</a>
+    <a href="{{ url_for('users') }}" class="sidebar-link {% if request.endpoint == 'users' %}active{% endif %}"><span class="icon">🧑</span> Users</a>
+    <a href="{{ url_for('settings') }}" class="sidebar-link settings-link {% if request.endpoint == 'settings' %}active{% endif %}"><span class="icon">⚙</span> Settings</a>
+</nav>
+{% block content %}
+<h1 class="page-title">⚙️ Settings</h1>
+<div class="settings-section">
+    <div class="avatar-block">
+        <div class="avatar">{{ user.profile_name[0]|upper }}</div>
+        <div class="avatar-name">{{ user.profile_name }}</div>
+    </div>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    <form method="POST" action="" class="settings-form">
+        <label for="profile_name">Profile Name:</label>
+        <input type="text" id="profile_name" name="profile_name" value="{{ user.profile_name }}" required>
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" value="{{ user.email }}" required>
+        <label for="notifications">Notifications:</label>
+        <select id="notifications" name="notifications">
+            <option value="enabled" {% if user.notifications == 'enabled' %}selected{% endif %}>Enabled</option>
+            <option value="disabled" {% if user.notifications == 'disabled' %}selected{% endif %}>Disabled</option>
+        </select>
+        <label for="theme">Theme:</label>
+        <select id="theme" name="theme">
+            <option value="light" {% if user.theme == 'light' %}selected{% endif %}>Light</option>
+            <option value="dark" {% if user.theme == 'dark' %}selected{% endif %}>Dark</option>
+        </select>
+        <button type="submit" class="btn btn-save">Save Changes</button>
+    </form>
+    <form action="{{ url_for('logout') }}" method="post" style="margin-top: 32px; text-align:center;">
+        <button type="submit" class="logout-btn">🚪 Log Out</button>
+    </form>
+</div>
+<style>
+.page-title { margin-bottom: 18px; }
+.avatar-block { display: flex; align-items: center; gap: 14px; margin-bottom: 18px; }
+.avatar { width: 48px; height: 48px; background: #1976d2; color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: 700; }
+.avatar-name { font-size: 1.2rem; font-weight: 600; }
+.settings-form { display: flex; flex-wrap: wrap; gap: 16px; align-items: center; }
+.settings-form label { font-weight: 500; }
+.settings-form input, .settings-form select { padding: 7px 10px; border-radius: 5px; border: 1px solid #e0e0e0; }
+.btn-save { background: #1976d2; color: #fff; border: none; border-radius: 5px; padding: 7px 18px; font-weight: 600; }
+.btn-save:hover { background: #125ea8; }
+.alert { background: #e0f7fa; color: #006064; border-radius: 5px; padding: 8px 12px; margin-bottom: 10px; }
+.logout-btn {
+    background: linear-gradient(90deg, #ef4444 0%, #f87171 100%);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 11px 32px;
+    font-size: 1.08rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.18s, box-shadow 0.18s;
+    box-shadow: 0 2px 8px rgba(239,68,68,0.13);
+    margin-top: 8px;
+}
+.logout-btn:hover {
+    background: linear-gradient(90deg, #c62828 0%, #ef4444 100%);
+    box-shadow: 0 4px 12px rgba(239,68,68,0.18);
+}
+</style>
+{% endblock %}

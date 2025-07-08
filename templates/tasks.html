@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+{% block title %}Tasks{% endblock %}
+
+{% block content %}
+<h1 class="page-title">📝 Tasks{% if filter %} - {{ filter.replace('_', ' ').title() }}{% endif %}</h1>
+<div class="progress-section">
+  <h2>Tasks Progress</h2>
+  <div class="progress-bar-container">
+    <div class="progress-bar tasks" style="width:{{ tasks_progress }}%;">
+      {{ tasks_progress }}%
+    </div>
+  </div>
+</div>
+<div class="tasks-filter-bar">
+  <form method="get" class="tasks-filter-form">
+    <label for="filter">Filter:</label>
+    <select name="filter" id="filter" onchange="this.form.submit()">
+      <option value="" {% if not filter %}selected{% endif %}>All</option>
+      <option value="assigned" {% if filter=='assigned' %}selected{% endif %}>Assigned</option>
+      <option value="due_today" {% if filter=='due_today' %}selected{% endif %}>Due Today</option>
+      <option value="past_due" {% if filter=='past_due' %}selected{% endif %}>Past Due</option>
+      <option value="completed" {% if filter=='completed' %}selected{% endif %}>Completed</option>
+    </select>
+  </form>
+</div>
+<div class="tasks-section">
+    <table class="styled-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Project Name</th>
+                <th>Job Number</th>
+                <th>Department</th>
+                <th>Job Description</th>
+                <th>EDC</th>
+                <th>Due Date</th>
+                <th>SPOC</th>
+                <th>Status</th>
+                <th>Completion %</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for task in tasks %}
+            <tr>
+                <td>{{ task['id'] }}</td>
+                <td>{{ task['project_name'] }}</td>
+                <td>{{ task['job_number'] }}</td>
+                <td>{{ task['department_name'] }}</td>
+                <td>{{ task['job_description'] }}</td>
+                <td>{{ task['edc'] }}</td>
+                <td>{{ task['due_date'] }}</td>
+                <td>{{ task['spoc'] }}</td>
+                <td>
+                  {% if task['status'] %}
+                    <span class="status-badge status-{{ task['status']|lower|replace(' ', '-') }}">{{ task['status'] }}</span>
+                  {% else %}
+                    <span class="status-badge status-na">N/A</span>
+                  {% endif %}
+                </td>
+                <td>
+                  {{ task['completion_percentage'] if task['completion_percentage'] is not none else 0 }}%
+                </td>
+                <!-- Upload form -->
+                <td>
+                  <form class="upload-form" enctype="multipart/form-data" action="/api/upload_task_file" method="POST" style="display:inline">
+                    <input type="file" name="files" webkitdirectory directory multiple style="display:inline" required />
+<small>Tip: You can select a folder. Works best in Chrome/Edge/Opera.</small>
+                    <input type="hidden" name="task_id" value="{{ task['id'] }}">
+                    <button type="submit">Upload</button>
+                  </form>
+                  <div class="upload-result"></div>
+                </td>
+            </tr>
+            {% else %}
+            <tr><td colspan="9">No tasks found.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <script>
+    document.querySelectorAll('.upload-form').forEach(function(form) {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            var resultDiv = form.nextElementSibling;
+            var formData = new FormData(form);
+            // Append all files to formData
+            var fileInput = form.querySelector('input[type="file"]');
+            var files = fileInput.files;
+            for (var i = 0; i < files.length; i++) {
+                formData.append('files', files[i], files[i].webkitRelativePath || files[i].name);
+            }
+            fetch('/api/upload_task_file', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    resultDiv.textContent = 'Upload successful: ' + data.filename;
+                    resultDiv.style.color = 'green';
+                } else {
+                    resultDiv.textContent = 'Upload failed: ' + (data.error || 'Unknown error');
+                    resultDiv.style.color = 'red';
+                }
+            })
+            .catch(error => {
+                resultDiv.textContent = 'Upload failed: ' + error;
+                resultDiv.style.color = 'red';
+            });
+        });
+    });
+    </script>
+</div>
+<style>
+.page-title { margin-bottom: 18px; }
+.tasks-filter-bar { margin-bottom: 16px; }
+.tasks-filter-form { display: flex; gap: 10px; align-items: center; }
+.styled-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+.styled-table th, .styled-table td { padding: 10px 14px; border-bottom: 1px solid #e0e0e0; }
+.styled-table th { background: #eff3f6; }
+.status-badge { padding: 3px 10px; border-radius: 12px; font-weight: 600; color: #fff; font-size: 0.95em; }
+.status-completed { background: #43a047; }
+.status-in-progress { background: #1976d2; }
+.status-pending { background: #fbc02d; color: #222; }
+.status-na { background: #bdbdbd; }
+.status-past-due { background: #e53935; }
+@media (max-width: 900px) {
+  .styled-table th, .styled-table td { padding: 7px 5px; font-size: 0.95em; }
+}
+</style>
+{% endblock %}
