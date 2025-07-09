@@ -287,7 +287,7 @@ def admin_dashboard():
                 flash(f'General error creating user: {e}', 'danger')
                 return redirect(url_for('admin_dashboard'))
             try:
-                msg_body = f"""Hello,\n\nYou have been added as a User by the Admin.\n\nYour login credentials are:\nUsername: {username}\nPassword: {password}\n\nPlease login at http://localhost:7000/login\n\nRegards,\nTask Progress Tracker Team\n"""
+                msg_body = f"""Hello,\n\nYou have been added as a User by the Admin.\n\nYour login credentials are:\nUsername: {username}\nPassword: {password}\n\nPlease login at https://kvr-admin-management.onrender.com/login\n\nRegards,\nTask Progress Tracker Team\n"""
                 msg = MIMEText(msg_body)
                 msg["Subject"] = "Your User Account Credentials"
                 msg["From"] = SENDER_EMAIL
@@ -425,7 +425,7 @@ def superadmin_dashboard():
                 )
                 # Send credentials to the new admin's Gmail
                 try:
-                    msg_body = f"""Hello,\n\nYou have been added as an Admin by the Superadmin.\n\nYour login credentials are:\nUsername: {username}\nPassword: {password}\n\nPlease login at http://localhost:7000/login\n\nRegards,\nTask Progress Tracker Team\n"""
+                    msg_body = f"""Hello,\n\nYou have been added as an Admin by the Superadmin.\n\nYour login credentials are:\nUsername: {username}\nPassword: {password}\n\nPlease login at https://kvr-admin-management.onrender.com/login\n\nRegards,\nTask Progress Tracker Team\n"""
                     msg = MIMEText(msg_body)
                     msg["Subject"] = "Your Admin Account Credentials"
                     msg["From"] = SENDER_EMAIL
@@ -466,7 +466,7 @@ Your login credentials are:
 Username: {username}
 Password: {password}
 
-Please login at http://localhost:7000/login
+Please login at https://kvr-admin-management.onrender.com/login
 
 Regards,
 Task Progress Tracker Team
@@ -514,7 +514,7 @@ def send_admin_credentials(admin_id):
         msg["To"] = receiver_email
         msg["Subject"] = "Your Admin Account Credentials"
         body = f"""
-        You have been added as an Admin by the Superadmin.\n\nUsername: {username}\nPassword: {password}\n\nPlease login at http://localhost:7000/login
+        You have been added as an Admin by the Superadmin.\n\nUsername: {username}\nPassword: {password}\n\nPlease login at https://kvr-admin-management.onrender.com/login
         """
         msg.attach(MIMEText(body, "plain"))
         with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
@@ -949,4 +949,6 @@ if __name__ == "__main__":
     with app.app_context():
         create_tables()
         ensure_task_status_column()
-    app.run(debug=True, port=7000)
+    port = int(os.environ.get('PORT', 10000))
+app.run(host="0.0.0.0", port=port)
+
