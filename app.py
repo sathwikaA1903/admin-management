@@ -6,15 +6,10 @@ from email.mime.text import MIMEText
 from datetime import datetime
 import os
 
-DATABASE = r'C:\Users\dell\Desktop\final\task progress tracking\tracker.db'
+DATABASE = 'tracker.db'
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your_secret_key_here'
-
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DATABASE = os.path.join(BASE_DIR, 'tracker.db')
-
-os.makedirs(os.path.dirname(DATABASE), exist_ok=True)
 
 # Set your Gmail credentials as environment variables or directly here
 SENDER_EMAIL = "l323sathwika@gmail.com"
@@ -76,25 +71,6 @@ def create_tables():
             FOREIGN KEY (department_id) REFERENCES department(id)
         )
     """)
-    db.execute("""
-        CREATE TABLE IF NOT EXISTS reminders (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            username TEXT NOT NULL,
-            reminder_text TEXT NOT NULL,
-            reminder_date DATE NOT NULL
-        )
-    """)
-    db.execute("""
-        CREATE TABLE IF NOT EXISTS task_uploads (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            task_id INTEGER NOT NULL,
-            filename TEXT NOT NULL,
-            filepath TEXT NOT NULL,
-            uploaded_by TEXT NOT NULL,
-            uploaded_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (task_id) REFERENCES task(id)
-        )
-    """)
     db.commit()
 
 # --- Seed Departments ---
@@ -110,10 +86,11 @@ def seed_departments():
         if not exists:
             query_db("INSERT INTO department (name) VALUES (?)", [name], commit=True)
 
+#change tho chai
 # --- Routes ---
 @app.route("/")
 def index():
-    return redirect(url_for('login'))
+    return dashboard()
 
 @app.route("/home")
 def home():
@@ -166,6 +143,8 @@ def dashboard():
         new_tasks=new_tasks
     )
 
+    discussion_progress = int((resolved_discussions / total_discussions) * 100) if total_discussions else 0
+
     # --- Notes Progress ---
     notes = query_db("SELECT content FROM note") if 'note' in get_table_names() else []
     total_notes = len(notes)
@@ -179,13 +158,15 @@ def dashboard():
     notes_progress = int((done_notes / total_notes) * 100) if total_notes else 0
 
     # --- Overall Progress ---
-    progress_values = [tasks_progress, notes_progress]
+    progress_values = [tasks_progress, documents_progress, discussion_progress, notes_progress]
     overall_progress = int(sum(progress_values) / len(progress_values)) if progress_values else 0
 
     return render_template(
         'dashboard.html',
         overall_progress=overall_progress,
         tasks_progress=tasks_progress,
+        documents_progress=documents_progress,
+        discussion_progress=discussion_progress,
         notes_progress=notes_progress,
         user_name=user_name,
         user_initials=user_initials
@@ -221,16 +202,9 @@ def login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        print(f'[DEBUG] Login attempt: username="{username}", password="{password}"')
         user = query_db("SELECT * FROM user WHERE username = ?", [username], one=True)
-        print(f'[DEBUG] DB user: {user}')
-        if user:
-            print(f'[DEBUG] Stored hash: {user["password"]}')
-            check_result = check_password_hash(user['password'], password)
-            print(f'[DEBUG] check_password_hash result: {check_result}')
-        else:
-            print('[DEBUG] No such user in DB')
         if user and check_password_hash(user['password'], password):
+
             session['username'] = username
             session['role'] = user['role']
             flash('Logged in successfully!')
@@ -287,7 +261,7 @@ def admin_dashboard():
                 flash(f'General error creating user: {e}', 'danger')
                 return redirect(url_for('admin_dashboard'))
             try:
-                msg_body = f"""Hello,\n\nYou have been added as a User by the Admin.\n\nYour login credentials are:\nUsername: {username}\nPassword: {password}\n\nPlease login at https://kvr-admin-management.onrender.com/login\n\nRegards,\nTask Progress Tracker Team\n"""
+                msg_body = f"""Hello,\n\nYou have been added as a User by the Admin.\n\nYour login credentials are:\nUsername: {username}\nPassword: {password}\n\nPlease login at https://kvr-progress-tracker.onrender.com/login\n\nRegards,\nTask Progress Tracker Team\n"""
                 msg = MIMEText(msg_body)
                 msg["Subject"] = "Your User Account Credentials"
                 msg["From"] = SENDER_EMAIL
@@ -425,7 +399,7 @@ def superadmin_dashboard():
                 )
                 # Send credentials to the new admin's Gmail
                 try:
-                    msg_body = f"""Hello,\n\nYou have been added as an Admin by the Superadmin.\n\nYour login credentials are:\nUsername: {username}\nPassword: {password}\n\nPlease login at https://kvr-admin-management.onrender.com/login\n\nRegards,\nTask Progress Tracker Team\n"""
+                    msg_body = f"""Hello,\n\nYou have been added as an Admin by the Superadmin.\n\nYour login credentials are:\nUsername: {username}\nPassword: {password}\n\nPlease login at https://kvr-progress-tracker.onrender.com/login\n\nRegards,\nTask Progress Tracker Team\n"""
                     msg = MIMEText(msg_body)
                     msg["Subject"] = "Your Admin Account Credentials"
                     msg["From"] = SENDER_EMAIL
@@ -466,7 +440,7 @@ Your login credentials are:
 Username: {username}
 Password: {password}
 
-Please login at https://kvr-admin-management.onrender.com/login
+Please login at https://kvr-progress-tracker.onrender.com/login
 
 Regards,
 Task Progress Tracker Team
@@ -514,7 +488,7 @@ def send_admin_credentials(admin_id):
         msg["To"] = receiver_email
         msg["Subject"] = "Your Admin Account Credentials"
         body = f"""
-        You have been added as an Admin by the Superadmin.\n\nUsername: {username}\nPassword: {password}\n\nPlease login at https://kvr-admin-management.onrender.com/login
+        You have been added as an Admin by the Superadmin.\n\nUsername: {username}\nPassword: {password}\n\nPlease login at https://kvr-progress-tracker.onrender.com/login
         """
         msg.attach(MIMEText(body, "plain"))
         with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
@@ -632,53 +606,29 @@ def discussion():
     return render_template('discussion.html', theme=session.get('theme', 'light'), discussions=discussions, discussion_progress=discussion_progress)
 
 # --- Documents ---
-
-from flask import send_file
-
-@app.route('/download_document/<int:doc_id>')
-def download_document(doc_id):
-    doc = query_db("SELECT * FROM document WHERE id = ?", [doc_id], one=True)
-    if not doc:
-        flash('Document not found.', 'danger')
-        return redirect(url_for('documents'))
-    file_path = doc.get('filepath') if 'filepath' in doc else None
-    if not file_path or not os.path.exists(file_path):
-        flash('File is missing on server.', 'danger')
-        return redirect(url_for('documents'))
-    return send_file(file_path, as_attachment=True, download_name=doc['filename'])
-
 @app.route('/documents', methods=['GET', 'POST'])
 def documents():
-    from flask import request, session, redirect, url_for, flash, render_template
-    from datetime import datetime
     if request.method == 'POST':
-        files = request.files.getlist('files')
-        if files:
-            uploader = session.get('username', 'Unknown')
-            uploaded_at = datetime.now().strftime('%Y-%m-%d %H:%M')
-            uploaded_files = []
-            for file in files:
-                if file.filename == '':
-                    continue
-                rel_path = file.filename.replace('\\', '/')
-                # Check for duplicate by filename
-                existing = query_db("SELECT id FROM document WHERE filename = ?", [rel_path], one=True)
-                if existing:
-                    flash(f"File '{rel_path}' already exists. Skipping.", 'documents')
-                    continue
-                save_path = os.path.join('uploads', rel_path)
-                save_dir = os.path.dirname(save_path)
-                os.makedirs(save_dir, exist_ok=True)
-                file.save(save_path)
-                query_db("INSERT INTO document (filename, uploader, uploaded_at) VALUES (?, ?, ?)", [rel_path, uploader, uploaded_at], commit=True)
-                uploaded_files.append(rel_path)
-            if uploaded_files:
-                flash(f"Uploaded: {', '.join(uploaded_files)}", 'documents')
-            else:
-                flash('No files uploaded.', 'documents')
-            return redirect(url_for('documents'))
-
-    # Ensure document table exists (one-time safety check)
+        if 'document' in request.files:
+            file = request.files['document']
+            if file.filename:
+                filename = file.filename
+                uploader = session.get('username', 'Unknown')
+                uploaded_at = datetime.now().strftime('%Y-%m-%d %H:%M')
+                os.makedirs('uploads', exist_ok=True)
+                file.save(os.path.join('uploads', filename))
+                query_db("""
+                    CREATE TABLE IF NOT EXISTS document (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        filename TEXT NOT NULL,
+                        uploader TEXT NOT NULL,
+                        uploaded_at TEXT NOT NULL
+                    )
+                """, commit=True)
+                query_db("INSERT INTO document (filename, uploader, uploaded_at) VALUES (?, ?, ?)",
+                         [filename, uploader, uploaded_at], commit=True)
+                flash('Document uploaded!', 'documents', 'success')
+                return redirect(url_for('documents'))
     query_db("""
         CREATE TABLE IF NOT EXISTS document (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -695,7 +645,14 @@ def documents():
         documents_progress = 100
     return render_template('documents.html', theme=session.get('theme', 'light'), documents=documents, documents_progress=documents_progress)
 
-
+@app.route('/documents/download/<int:doc_id>')
+def download_document(doc_id):
+    doc = query_db("SELECT * FROM document WHERE id=?", [doc_id], one=True)
+    if doc:
+        from flask import send_from_directory
+        return send_from_directory('uploads', doc['filename'], as_attachment=True)
+    flash('Document not found!', 'danger')
+    return redirect(url_for('documents'))
 
 # --- Notes ---
 @app.route('/notes', methods=['GET', 'POST'])
@@ -847,108 +804,12 @@ def ensure_task_status_column():
         db.execute("ALTER TABLE task ADD COLUMN status TEXT DEFAULT 'Pending'")
         db.commit()
 
-from flask import jsonify
-
-@app.route('/api/statistics')
-def statistics_api():
-    from flask import request, session
-    import datetime
-    stat_type = request.args.get('type', 'monthly')
-    user_name = session.get('username', 'Demo User')
-    department_id = session.get('department_id')
-    if not department_id:
-        user = query_db("SELECT department_id FROM user WHERE username = ?", [user_name], one=True)
-        department_id = user['department_id'] if user and user['department_id'] else None
-        if department_id:
-            session['department_id'] = department_id
-
-    now = datetime.datetime.now()
-    if stat_type == 'monthly':
-        start_date = now.replace(day=1).strftime('%Y-%m-%d')
-    elif stat_type == 'weekly':
-        start_date = (now - datetime.timedelta(days=now.weekday())).strftime('%Y-%m-%d')
-    elif stat_type == 'mytask':
-        # For demo, assume 'spoc' is the username
-        if department_id:
-            tasks = query_db("SELECT status FROM task WHERE department_id = ? AND spoc = ?", [department_id, user_name])
-        else:
-            tasks = []
-        completed = len([t for t in tasks if t['status'] and t['status'].lower() == 'completed'])
-        incomplete = len([t for t in tasks if not t['status'] or t['status'].lower() != 'completed'])
-        return jsonify({'completed': completed, 'incomplete': incomplete})
-    else:
-        return jsonify({'error': 'Invalid type'}), 400
-
-    # For monthly/weekly, filter by due_date
-    if department_id:
-        tasks = query_db("SELECT status FROM task WHERE department_id = ? AND due_date >= ?", [department_id, start_date])
-    else:
-        tasks = []
-    completed = len([t for t in tasks if t['status'] and t['status'].lower() == 'completed'])
-    incomplete = len([t for t in tasks if not t['status'] or t['status'].lower() != 'completed'])
-    return jsonify({'completed': completed, 'incomplete': incomplete})
-
-@app.route('/api/reminders/today')
-def get_todays_reminders():
-    from flask import session
-    user_name = session.get('username', 'Demo User')
-    today = datetime.now().strftime('%Y-%m-%d')
-    reminders = query_db("SELECT reminder_text FROM reminders WHERE username = ? AND reminder_date = ?", [user_name, today])
-    return jsonify({'reminders': [r['reminder_text'] for r in reminders]})
-
-@app.route('/api/reminders/add', methods=['POST'])
-def add_reminder():
-    from flask import request, session
-    data = request.get_json()
-    user_name = session.get('username', 'Demo User')
-    reminder_text = data.get('reminder_text')
-    reminder_date = data.get('reminder_date')
-    if not reminder_text or not reminder_date:
-        return jsonify({'error': 'Missing reminder text or date'}), 400
-    query_db("INSERT INTO reminders (username, reminder_text, reminder_date) VALUES (?, ?, ?)", [user_name, reminder_text, reminder_date], commit=True)
-    return jsonify({'success': True})
-
 import os
-from werkzeug.utils import secure_filename
-
-UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), 'uploads')
-if not os.path.exists(UPLOAD_FOLDER):
-    os.makedirs(UPLOAD_FOLDER)
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-
-@app.route('/api/upload_task_file', methods=['POST'])
-def upload_task_file():
-    from flask import request, session
-    import os
-    from werkzeug.utils import secure_filename
-    files = request.files.getlist('files')
-    task_id = request.form.get('task_id')
-    user_name = session.get('username', 'Demo User')
-    if not files or not task_id:
-        return {'error': 'Missing files or task_id'}, 400
-    uploaded_files = []
-    for file in files:
-        if file.filename == '':
-            continue
-        # Use webkitRelativePath if present for folder structure, else filename
-        rel_path = getattr(file, 'webkit_relative_path', None) or getattr(file, 'webkitRelativePath', None) or file.filename
-        rel_path = rel_path.replace('\\', '/')  # Normalize Windows paths
-        save_path = os.path.join(app.config['UPLOAD_FOLDER'], rel_path)
-        save_dir = os.path.dirname(save_path)
-        os.makedirs(save_dir, exist_ok=True)
-        file.save(save_path)
-        query_db("INSERT INTO task_uploads (task_id, filename, filepath, uploaded_by) VALUES (?, ?, ?, ?)", [task_id, rel_path, save_path, user_name], commit=True)
-        uploaded_files.append(rel_path)
-    # Mark the task as completed if at least one file uploaded
-    if uploaded_files:
-        query_db("UPDATE task SET status = 'Completed' WHERE id = ?", [task_id], commit=True)
-    return {'success': True, 'uploaded_files': uploaded_files}
-
 
 if __name__ == "__main__":
     with app.app_context():
         create_tables()
         ensure_task_status_column()
-    port = int(os.environ.get('PORT', 10000))
-app.run(host="0.0.0.0", port=port)
-
+    
+    port = int(os.environ.get("PORT", 10000))  # default to 10000 if PORT is not set
+    app.run(host="0.0.0.0", port=port)
