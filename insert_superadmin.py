@@ -2,7 +2,7 @@ import sqlite3
 from werkzeug.security import generate_password_hash
 
 # Connect to the database
-con = sqlite3.connect(r'C:\Users\dell\Desktop\final\task progress tracking\tracker.db')
+con = sqlite3.connect(r'C:\Users\sathwika\Desktop\task progress tracking\tracker.db')
 cur = con.cursor()
 
 # Username and hashed password for superadmin
